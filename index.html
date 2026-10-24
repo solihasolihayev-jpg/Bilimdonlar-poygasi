@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilimdonlar Poygasi 3D</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;color:white;background:#07152f}
+header{text-align:center;padding:18px;background:#102c59}
+h1{margin:0;color:#ffe66d}
+.subtitle{margin-top:8px}
+main{max-width:1000px;margin:auto;padding:16px}
+.panel{background:#102447;border:1px solid #31558a;border-radius:16px;padding:18px;margin-bottom:16px}
+input,select,button{width:100%;padding:13px;margin-top:10px;border:0;border-radius:9px;font-size:16px}
+button{background:#ffca28;color:#18233c;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.sky{height:250px;position:relative;overflow:hidden;border-radius:15px;
+background:linear-gradient(#168be8 0%,#a9e5ff 68%,#f4fbff 100%)}
+.cloud{position:absolute;font-size:48px;filter:drop-shadow(0 4px 3px #477da0)}
+.c1{left:5%;top:20px}.c2{right:8%;top:65px}.c3{left:40%;top:0}
+.track{position:absolute;bottom:-85px;left:-10%;width:120%;height:180px;
+background:#3a465a;border-top:10px dashed white;transform:rotate(-4deg);
+box-shadow:0 -5px 0 #ffcb39}
+.car{position:absolute;bottom:48px;left:10%;font-size:44px;transition:left .5s}
+.finish{position:absolute;right:5%;bottom:80px;font-size:28px}
+.stats{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.stat{background:#183963;padding:12px;border-radius:10px;flex:1;text-align:center}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answers button{color:white;background:#2859a8}
+.answers button:nth-child(2){background:#a13a50}
+.answers button:nth-child(3){background:#6d42b5}
+.answers button:nth-child(4){background:#16836d}
+#message{font-weight:bold;min-height:24px;margin-top:12px}
+#leaderboard{padding-left:24px}
+footer{text-align:center;padding:20px;color:#b8d5ff}
+@media(max-width:550px){.answers{grid-template-columns:1fr}.sky{height:210px}}
+</style>
+</head>
+<body>
+<header>
+<h1>🏁 BILIMDONLAR POYGASI 🏎️</h1>
+<div class="subtitle">Bilimingni sinab ko‘r, poygada g‘olib bo‘l!</div>
+</header>
+
+<main>
+<section class="panel" id="setup">
+<h2>👤 Poygachini yaratish</h2>
+<label for="playerName">Ismingiz</label>
+<input id="playerName" maxlength="24" placeholder="Ismingizni kiriting">
+<label for="avatar">Avatar tanlang</label>
+<select id="avatar">
+<option value="🧑‍🎓">Talaba</option>
+<option value="👩‍🎓">Talaba qiz</option>
+<option value="🧑‍🚀">Kosmonavt</option>
+<option value="🦸">Super qahramon</option>
+<option value="🥷">Ninja</option>
+<option value="🤖">Robot</option>
+</select>
+<label for="vehicle">Transport tanlang</label>
+<select id="vehicle">
+<option value="🏎️">Sport avtomobili</option>
+<option value="🚗">Poyga avtomobili</option>
+<option value="🏍️">Mototsikl</option>
+<option value="🚙">Ralli avtomobili</option>
+</select>
+<button id="startBtn" onclick="startGame()">🏁 Poygani boshlash</button>
+</section>
+
+<section class="panel">
+<div class="sky">
+<div class="cloud c1">☁️</div>
+<div class="cloud c2">☁️</div>
+<div class="cloud c3">🎈</div>
+<div class="finish">🏁</div>
+<div class="track"></div>
+<div class="car" id="car">🏎️</div>
+</div>
+<div class="stats" style="margin-top:12px">
+<div class="stat">🏆 Ball: <b id="score">0</b></div>
+<div class="stat">⚡ Tezlik: <b id="speed">0</b></div>
+<div class="stat">📝 Savol: <b id="progress">0/10</b></div>
+<div class="stat">⏱️ Vaqt: <b id="timer">20</b></div>
+</div>
+</section>
+
+<section class="panel" id="quiz">
+<h2 id="question">Poygani boshlash uchun ismingizni kiriting!</h2>
+<div class="answers" id="answers"></div>
+<div id="message" role="status" aria-live="polite"></div>
+<button id="nextBtn" onclick="nextQuestion()" hidden>Keyingi savol ➜</button>
+</section>
+
+<section class="panel">
+<h2>🥇 Poyga natijalari</h2>
+<ol id="leaderboard"><li>Hali natijalar yo‘q</li></ol>
+</section>
+</main>
+
+<footer>Bilimdonlar Poygasi 3D · Bilim — g‘alabaning kaliti!</footer>
+
+<script>
+const questions = [
+{q:"Kompyuterning asosiy hisoblash qurilmasi qaysi?",a:["Monitor","Protsessor","Klaviatura","Sichqoncha"],c:1},
+{q:"Internet sahifalarini ko‘rish uchun nima ishlatiladi?",a:["Brauzer","Kalkulyator","Paint","Bloknot"],c:0},
+{q:"Algoritm nima?",a:["Kompyuter turi","Rasm","Masalani yechish ketma-ketligi","Monitor"],c:2},
+{q:"1 kilobayt an’anaviy hisobda necha bayt?",a:["100","1024","10","8"],c:1},
+{q:"HTML asosan nima uchun ishlatiladi?",a:["Veb-sahifa tuzilishi","Video montaj","Hisoblash qurilmasi","Antivirus"],c:0},
+{q:"Klaviatura qanday qurilma?",a:["Chiqarish","Saqlash","Kiritish","Tarmoq"],c:2},
+{q:"CPU nimani anglatadi?",a:["Markaziy protsessor","Monitor","Internet","Printer"],c:0},
+{q:"Fayllarni saqlash uchun qaysi qurilma ishlatiladi?",a:["Sichqoncha","SSD","Mikrofon","Kamera"],c:1},
+{q:"Internet nima?",a:["Faqat dastur","Global kompyuter tarmog‘i","Klaviatura","Operatsion tizim"],c:1},
+{q:"Brauzerga misol qaysi?",a:["Chrome","Excel","Paint","Notepad"],c:0}
+];
+
+let index=0,score=0,speed=0,time=20,timerId=null;
+let active=false,locked=true,player="",vehicle="🏎️",avatar="🧑‍🎓";
+let results=[];
+
+function startGame(){
+ player=document.getElementById("playerName").value.trim();
+ if(!player){alert("Iltimos, avval ismingizni kiriting!");return}
+ avatar=document.getElementById("avatar").value;
+ vehicle=document.getElementById("vehicle").value;
+ index=0;score=0;speed=0;active=true;
+ document.getElementById("car").textContent=vehicle;
+ document.getElementById("score").textContent=score;
+ document.getElementById("speed").textContent=speed;
+ document.getElementById("setup").style.display="none";
+ showQuestion();
+}
+
+function showQuestion(){
+ clearInterval(timerId);
+ if(index>=questions.length){finishGame();return}
+ locked=false;time=20;
+ document.getElementById("progress").textContent=(index+1)+"/"+questions.length;
+ document.getElementById("timer").textContent=time;
+ document.getElementById("question").textContent=questions[index].q;
+ document.getElementById("message").textContent="";
+ document.getElementById("nextBtn").hidden=true;
+ const box=document.getElementById("answers");box.innerHTML="";
+ questions[index].a.forEach((answer,i)=>{
+  const b=document.createElement("button");
+  b.textContent=String.fromCharCode(65+i)+") "+answer;
+  b.onclick=()=>answerQuestion(i);
+  box.appendChild(b);
+ });
+ timerId=setInterval(()=>{
+  time--;document.getElementById("timer").textContent=time;
+  if(time<=0)answerQuestion(-1);
+ },1000);
+}
+
+function answerQuestion(choice){
+ if(locked||!active)return;
+ locked=true;clearInterval(timerId);
+ document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+ const correct=choice===questions[index].c;
+ if(correct){
+  const earned=Math.max(10,time*5);
+  score+=earned;speed+=10;
+  document.getElementById("message").textContent="✅ To‘g‘ri! +"+earned+" ball. Tezlik oshdi!";
+  document.getElementById("car").style.left=Math.min(72,10+speed*.6)+"%";
+ }else{
+  speed=Math.max(0,speed-5);
+  document.getElementById("message").textContent="❌ Noto‘g‘ri yoki vaqt tugadi. Tezlik pasaydi!";
+ }
+ document.getElementById("score").textContent=score;
+ document.getElementById("speed").textContent=speed;
+ document.getElementById("nextBtn").hidden=false;
+}
+
+function nextQuestion(){if(!locked)return;index++;showQuestion()}
+
+function finishGame(){
+ active=false;clearInterval(timerId);
+ document.getElementById("question").textContent="🏁 Poyga yakunlandi!";
+ document.getElementById("answers").innerHTML="";
+ document.getElementById("message").textContent="Ajoyib, "+player+"! Siz "+score+" ball to‘pladingiz! 🎉";
+ document.getElementById("nextBtn").hidden=true;
+ results.push({player,avatar,score});
+ results.sort((a,b)=>b.score-a.score);
+ document.getElementById("leaderboard").innerHTML="";
+ results.slice(0,5).forEach(r=>{
+  const li=document.createElement("li");
+  li.textContent=r.avatar+" "+r.player+" — "+r.score+" ball";
+  document.getElementById("leaderboard").appendChild(li);
+ });
+ document.getElementById("setup").style.display="block";
+ document.getElementById("startBtn").textContent="🔄 Qayta o‘ynash";
+}
+</script>
+</body>
+</html>
