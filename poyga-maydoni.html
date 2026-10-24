@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilimdonlar poygasi — 3D arena</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: #06152d;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+button, input { font: inherit; }
+
+button {
+    cursor: pointer;
+    border: 0;
+    border-radius: 9px;
+    padding: 10px;
+    color: white;
+    background: #087ff5;
+}
+
+button:hover { filter: brightness(1.15); }
+
+#arena {
+    position: relative;
+    width: 100%;
+    height: 72vh;
+    min-height: 420px;
+    overflow: hidden;
+    background: linear-gradient(#5cb8ff, #e3f7ff);
+}
+
+#scene {
+    position: absolute;
+    inset: 0;
+}
+
+#scene canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.topbar {
+    position: absolute;
+    z-index: 2;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.badge {
+    background: #071c3de8;
+    border: 1px solid #5caaff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: bold;
+}
+
+#leaderboard {
+    position: absolute;
+    z-index: 2;
+    top: 72px;
+    left: 12px;
+    width: 190px;
+    padding: 12px;
+    border-radius: 14px;
+    background: #071c3deb;
+    border: 1px solid #429eff;
+}
+
+#leaderboard h3 { margin: 0 0 8px; }
+
+.rankrow {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #ffffff18;
+    font-size: 13px;
+}
+
+#speedbox {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    z-index: 2;
+    background: #071c3de8;
+    border: 2px solid #12baff;
+    border-radius: 50%;
+    width: 112px;
+    height: 112px;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    box-shadow: 0 0 25px #00aaff88;
+}
+
+#speed { font-size: 30px; font-weight: bold; }
+
+#finishLabel {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: clamp(28px, 6vw, 60px);
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 3px 12px #005aff;
+    pointer-events: none;
+}
+
+#panels {
+    display: grid;
+    grid-template-columns: minmax(250px, 1.2fr) minmax(220px, .8fr);
+    gap: 12px;
+    padding: 12px;
+}
+
+.panel {
+    background: #0c2444;
+    border: 1px solid #2f83cf;
+    border-radius: 15px;
+    padding: 16px;
+    min-width: 0;
+}
+
+.panel h2 { margin-top: 0; }
+
+#question {
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 16px 0;
+}
+
+#answers {
+    display: grid;
+    gap: 9px;
+}
+
+.answer {
+    text-align: left;
+    background: #173c68;
+    border: 1px solid #387dbd;
+    padding: 13px;
+}
+
+.answer:disabled { cursor: default; opacity: .95; }
+
+#timerbar {
+    height: 9px;
+    background: #263d5b;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#timerfill {
+    height: 100%;
+    width: 100%;
+    background: #21d6ff;
+    transition: width .2s linear;
+}
+
+#message {
+    min-height: 24px;
+    color: #7dffbd;
+    margin: 12px 0;
+}
+
+#next { width: 100%; }
+
+.settings {
+    display: grid;
+    gap: 10px;
+}
+
+.settings input, .settings select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #3d6d9e;
+    color: white;
+    background: #081a33;
+}
+
+.note {
+    color: #b9d7f6;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 650px) {
+    #arena { height: 68vh; min-height: 390px; }
+    #leaderboard { width: 150px; font-size: 12px; }
+    #speedbox { width: 85px; height: 85px; }
+    #speed { font-size: 23px; }
+    #panels { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<section id="arena">
+    <div id="scene"></div>
+
+    <div class="topbar">
+        <div class="badge">🏁 BILIMDONLAR POYGASI</div>
+        <div class="badge" id="status">☁️ Osmon trassasi</div>
+    </div>
+
+    <div id="leaderboard">
+        <h3>🏆 Reyting</h3>
+        <div id="ranklist"></div>
+    </div>
+
+    <div id="finishLabel">🏁 FINISH</div>
+
+    <div id="speedbox">
+        <div>TEZLIK</div>
+        <div id="speed">100</div>
+        <div>km/soat</div>
+    </div>
+</section>
+
+<section id="panels">
+
+    <div class="panel">
+        <h2>❓ Bilimlar sinovi</h2>
+
+        <div style="display:flex;justify-content:space-between;gap:10px">
+            <span id="questionNo">Savol 1 / 5</span>
+            <b id="timer">20 soniya</b>
+        </div>
+
+        <div id="timerbar"><div id="timerfill"></div></div>
+
+        <div id="question"></div>
+        <div id="answers"></div>
+        <div id="message"></div>
+
+        <button id="next" onclick="nextQuestion()" disabled>
+            Keyingi savol →
+        </button>
+    </div>
+
+    <div class="panel">
+        <h2>👤 Poygachi</h2>
+
+        <div class="settings">
+            <label>
+                Ismingiz
+                <input id="playerName" value="Men" maxlength="24">
+            </label>
+
+            <label>
+                Vaqtni tanlang
+                <select id="questionTime">
+                    <option value="10">10 soniya</option>
+                    <option value="20" selected>20 soniya</option>
+                    <option value="30">30 soniya</option>
+                </select>
+            </label>
+
+            <button onclick="startRace()">🚦 Poygani boshlash</button>
+            <button onclick="toggleSound()">🔊 Musiqani yoqish/o‘chirish</button>
+
+            <p class="note">
+                To‘g‘ri va tez javob ko‘proq ball beradi.
+                Xato javob poygachi tezligini pasaytiradi.
+            </p>
+        </div>
+    </div>
+
+</section>
+
+<script type="module">
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+const host = document.getElementById("scene");
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x73c6ff);
+scene.fog = new THREE.Fog(0x9bdcff, 100, 380);
+
+const camera = new THREE.PerspectiveCamera(
+    65, host.clientWidth / host.clientHeight, 0.1, 1000
+);
+camera.position.set(0, 8, 17);
+camera.lookAt(0, 2, -25);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(host.clientWidth, host.clientHeight);
+renderer.shadowMap.enabled = true;
+host.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xe6f6ff, 0x637b9b, 2));
+
+const sun = new THREE.DirectionalLight(0xffffff, 3);
+sun.position.set(-30, 60, 20);
+sun.castShadow = true;
+scene.add(sun);
+
+function material(color, extra = {}) {
+    return new THREE.MeshStandardMaterial({ color, ...extra });
+}
+
+function box(parent, x, y, z, w, h, d, color) {
+    const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(w, h, d),
+        material(color)
+    );
+    mesh.position.set(x, y, z);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    parent.add(mesh);
+    return mesh;
+}
+
+function sphere(parent, x, y, z, r, color, sx = 1, sy = 1, sz = 1) {
+    const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(r, 12, 10),
+        material(color)
+    );
+    mesh.position.set(x, y, z);
+    mesh.scale.set(sx, sy, sz);
+    parent.add(mesh);
+    return mesh;
+}
+
+// Bulutlar ostidagi osmon dunyosi
+const clouds = [];
+
+for (let i = 0; i < 75; i++) {
+    const group = new THREE.Group();
+
+    group.position.set(
+        (Math.random() - 0.5) * 260,
+        4 + Math.random() * 35,
+        -Math.random() * 330
+    );
+
+    const count = 3 + Math.floor(Math.random() * 4);
+
+    for (let j = 0; j < count; j++) {
+        sphere(
+            group,
+            (Math.random() - .5) * 7,
+            Math.random() * 2,
+            (Math.random() - .5) * 5,
+            2 + Math.random() * 3,
+            0xffffff,
+            1.4, .65, 1
+        );
+    }
+
+    scene.add(group);
+    clouds.push(group);
+}
+
+// Uzoqdagi suzuvchi orollar va qasrlar
+function castle(x, z, scale = 1) {
+    const group = new THREE.Group();
+    group.position.set(x, 0, z);
+    group.scale.setScalar(scale);
+
+    // Suzuvchi orol
+    const island = new THREE.Mesh(
+        new THREE.ConeGeometry(7, 9, 7),
+        material(0x558a64)
+    );
+    island.rotation.x = Math.PI;
+    island.position.y = -2;
+    group.add(island);
+
+    // Qasr markazi
+    box(group, 0, 3, 0, 7, 6, 5, 0xffd9a1);
+
+    // Minoralar
+    for (const [tx, tz] of [[-3,-2],[3,-2],[-3,2],[3,2]]) {
+        box(group, tx, 5, tz, 1.5, 8, 1.5, 0xffe8bd);
+
+        const roof = new THREE.Mesh(
+            new THREE.ConeGeometry(1.25, 2.5, 4),
+            material(0xb63d68)
+        );
+        roof.position.set(tx, 10.2, tz);
+        group.add(roof);
+    }
+
+    scene.add(group);
+}
+
+castle(-45, -65, 1.5);
+castle(43, -95, 1.8);
+castle(-62, -180, 1.2);
+castle(65, -220, 1.5);
+
+// Dirijablllar
+const airships = [];
+
+function airship(x, y, z, color) {
+    const group = new THREE.Group();
+
+    sphere(group, 0, 0, 0, 4, color, 1.8, .65, .65);
+    box(group, 0, -2, 0, 2.5, 1, 1.5, 0x65452e);
+
+    for (let i = -1; i <= 1; i++) {
+        box(group, i * 1.7, 0, 0, .1, .1, .1, 0xffffff);
+    }
+
+    group.position.set(x, y, z);
+    scene.add(group);
+    airships.push(group);
+}
+
+airship(-25, 24, -55, 0x244de1);
+airship(32, 30, -115, 0xd74d65);
+airship(-50, 34, -200, 0xffc642);
+
+// Poyga yo'li
+box(scene, 0, -1, -130, 24, 1, 300, 0x29384b);
+
+// Yo'l chetidagi qizil-oq belgilar
+for (let z = 12; z > -275; z -= 5) {
+    for (const x of [-12.5, 12.5]) {
+        box(scene, x, -.35, z, 1, .4, 4, 0xf4f6ff);
+    }
+}
+
+// Yo'lning markaziy chiziqlari
+for (let z = 12; z > -275; z -= 12) {
+    box(scene, 0, -.43, z, .25, .06, 5, 0xffe36e);
+}
+
+// Tribunalar va muxlislar
+for (const side of [-1, 1]) {
+    box(scene, side * 17, 1, -40, 7, 3, 90, 0x1d4e83);
+
+    for (let i = 0; i < 130; i++) {
+        const x = side * (14 + Math.random() * 7);
+        const z = 5 - Math.random() * 115;
+        const colors = [
+            0xff4757, 0xffc857, 0x40d9ff,
+            0xffffff, 0x8b78ff, 0x4ce09a
+        ];
+
+        const fan = sphere(
+            scene, x, 2.5 + Math.random() * 2, z,
+            .35, colors[Math.floor(Math.random() * colors.length)]
+        );
+
+        fan.scale.set(.7, 1.4, .7);
+    }
+}
+
+// Finish darvozasi
+box(scene, -10, 5, -245, 1, 10, 1, 0x087ff5);
+box(scene, 10, 5, -245, 1, 10, 1, 0x087ff5);
+box(scene, 0, 10, -245, 21, 1, 1.5, 0x087ff5);
+
+for (let i = 0; i < 10; i++) {
+    box(scene, -9 + i * 2, 10.6, -245, 2, .3, .2,
+        i % 2 ? 0xffffff : 0x101010);
+}
+
+// Avtomobil yaratish
+function car(color, x, z) {
+    const group = new THREE.Group();
+
+    box(group, 0, .7, 0, 2.5, .7, 4, color);
+    box(group, 0, 1.25, -.3, 1.6, .7, 1.7, 0x79d9ff);
+
+    for (const wx of [-1.2, 1.2]) {
+        for (const wz of [-1.3, 1.3]) {
+            const wheel = new THREE.Mesh(
+                new THREE.CylinderGeometry(.42, .42, .25, 16),
+                material(0x151515)
+            );
+            wheel.rotation.z = Math.PI / 2;
+            wheel.position.set(wx, .4, wz);
+            group.add(wheel);
+        }
+    }
+
+    group.position.set(x, 0, z);
+    scene.add(group);
+    return group;
+}
+
+const playerCar = car(0x087bff, 0, 7);
+
+const opponents = [
+    car(0xff4359, -5, 3),
+    car(0xffc52e, 5, 0),
+    car(0x35d49a, -5, -4),
+    car(0x9b63ff, 5, -8)
+];
+
+const racerNames = ["Men", "Azizbek", "Sevinch", "Javohir", "Mohinur"];
+
+const racers = racerNames.map((name, i) => ({
+    name,
+    score: 0,
+    distance: 0,
+    speed: i === 0 ? 12 : 10 + Math.random() * 3
+}));
+
+// Savollar
+const questions = [
+    {
+        q: "Kompyuterning asosiy hisoblash qurilmasi qaysi?",
+        a: ["Monitor", "Protsessor", "Klaviatura", "Sichqoncha"],
+        correct: 1
+    },
+    {
+        q: "Internet sahifalarini ko‘rish uchun nima ishlatiladi?",
+        a: ["Brauzer", "Kalkulyator", "Paint", "Bloknot"],
+        correct: 0
+    },
+    {
+        q: "Algoritm nima?",
+        a: [
+            "Kompyuter qurilmasi",
+            "Rasm formati",
+            "Masalani yechish amallari ketma-ketligi",
+            "Internet tarmog‘i"
+        ],
+        correct: 2
+    },
+    {
+        q: "Klaviatura qanday qurilma?",
+        a: [
+            "Chiqarish qurilmasi",
+            "Kiritish qurilmasi",
+            "Saqlash qurilmasi",
+            "Tarmoq qurilmasi"
+        ],
+        correct: 1
+    },
+    {
+        q: "HTML asosan nima uchun ishlatiladi?",
+        a: [
+            "Veb-sahifa tuzilishi uchun",
+            "Faqat video montaj uchun",
+            "Kompyuterni ta'mirlash uchun",
+            "Elektr tokini boshqarish uchun"
+        ],
+        correct: 0
+    }
+];
+
+let current = 0;
+let remaining = 20;
+let timerId = null;
+let answered = false;
+let running = false;
+let audioContext = null;
+let soundOn = false;
+
+function sound(freq = 600, duration = .15) {
+    if (!soundOn) return;
+
+    try {
+        audioContext ||= new (
+            window.AudioContext || window.webkitAudioContext
+        )();
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume();
+        }
+
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+
+        gain.gain.value = .08;
+        gain.gain.exponentialRampToValueAtTime(
+            .001, audioContext.currentTime + duration
+        );
+
+        osc.start();
+        osc.stop(audioContext.currentTime + duration);
+    } catch (e) {
+        console.warn("Ovoz ishga tushmadi:", e);
+    }
+}
+
+window.toggleSound = function() {
+    soundOn = !soundOn;
+
+    if (soundOn) {
+        sound(660, .2);
+    }
+
+    document.getElementById("status").textContent =
+        soundOn ? "🔊 Ovoz yoqildi" : "🔇 Ovoz o‘chirildi";
+};
+
+function renderQuestion() {
+    answered = false;
+
+    const q = questions[current];
+
+    document.getElementById("questionNo").textContent =
+        `Savol ${current + 1} / ${questions.length}`;
+
+    document.getElementById("question").textContent = q.q;
+    document.getElementById("message").textContent = "";
+    document.getElementById("next").disabled = true;
+
+    const holder = document.getElementById("answers");
+    holder.innerHTML = "";
+
+    q.a.forEach((text, i) => {
+        const button = document.createElement("button");
+
+        button.className = "answer";
+        button.textContent = `${"ABCD"[i]}. ${text}`;
+        button.onclick = () => answerQuestion(i);
+
+        holder.appendChild(button);
+    });
+
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerId);
+
+    remaining = Number(document.getElementById("questionTime").value);
+
+    document.getElementById("timer").textContent =
+        remaining + " soniya";
+
+    document.getElementById("timerfill").style.width = "100%";
+
+    timerId = setInterval(() => {
+        if (!running || answered) return;
+
+        remaining--;
+
+        document.getElementById("timer").textContent =
+            remaining + " soniya";
+
+        document.getElementById("timerfill").style.width =
+            (remaining / Number(
+                document.getElementById("questionTime").value
+            ) * 100) + "%";
+
+        if (remaining <= 0) {
+            answerQuestion(-1);
+        }
+    }, 1000);
+}
+
+function answerQuestion(index) {
+    if (answered || !running) return;
+
+    answered = true;
+    clearInterval(timerId);
+
+    const q = questions[current];
+    const buttons = document.querySelectorAll(".answer");
+    const correct = index === q.correct;
+
+    buttons.forEach((b, i) => {
+        b.disabled = true;
+
+        if (i === q.correct) {
+            b.style.background = "#087b54";
+        } else if (i === index) {
+            b.style.background = "#a83248";
+        }
+    });
+
+    if (correct) {
+        const limit = Number(document.getElementById("questionTime").value);
+        const points = 10 + Math.round(10 * remaining / limit);
+
+        racers[0].score += points;
+        racers[0].speed = Math.min(25, racers[0].speed + 3);
+
+        document.getElementById("message").textContent =
+            `✅ To‘g‘ri! +${points} ball. Poygachi tezlashdi!`;
+
+        sound(820, .22);
+    } else {
+        racers[0].speed = Math.max(3, racers[0].speed - 3);
+
+        document.getElementById("message").textContent =
+            index === -1
+            ? "⏱️ Vaqt tugadi! Poygachi sekinlashdi."
+            : "❌ Noto‘g‘ri javob. Poygachi sekinlashdi.";
+
+        sound(190, .3);
+    }
+
+    document.getElementById("next").disabled = false;
+    updateLeaderboard();
+}
+
+window.nextQuestion = function() {
+    if (!running || !answered) return;
+
+    current++;
+
+    if (current >= questions.length) {
+        running = false;
+        clearInterval(timerId);
+
+        document.getElementById("question").textContent =
+            "🏆 Sinov yakunlandi!";
+
+        document.getElementById("answers").innerHTML = "";
+
+        document.getElementById("message").textContent =
+            `Siz ${racers[0].score} ball to‘pladingiz!`;
+
+        document.getElementById("next").disabled = true;
+        document.getElementById("status").textContent =
+            "🏁 Poyga yakunlandi";
+
+        return;
+    }
+
+    renderQuestion();
+};
+
+window.startRace = function() {
+    racers[0].name =
+        document.getElementById("playerName").value.trim() || "Men";
+
+    racers[0].score = 0;
+    racers[0].distance = 0;
+    racers[0].speed = 12;
+
+    current = 0;
+    running = true;
+
+    document.getElementById("status").textContent =
+        "🏎️ Poyga boshlandi!";
+
+    renderQuestion();
+    updateLeaderboard();
+};
+
+function updateLeaderboard() {
+    const sorted = [...racers].sort((a, b) =>
+        b.distance - a.distance || b.score - a.score
+    );
+
+    document.getElementById("ranklist").innerHTML =
+        sorted.map((r, i) => `
+            <div class="rankrow">
+                <span>${i + 1}. ${escapeHtml(r.name)}</span>
+                <b>${r.score}</b>
+            </div>
+        `).join("");
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[c]);
+}
+
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    const delta = Math.min(clock.getDelta(), .05);
+    const time = clock.elapsedTime;
+
+    clouds.forEach((cloud, i) => {
+        cloud.position.x += delta * (i % 2 ? .7 : -.5);
+
+        if (cloud.position.x > 140) cloud.position.x = -140;
+        if (cloud.position.x < -140) cloud.position.x = 140;
+    });
+
+    airships.forEach((ship, i) => {
+        ship.position.x += Math.sin(time * .4 + i) * delta * .8;
+        ship.position.y += Math.sin(time + i) * delta * .3;
+    });
+
+    if (running) {
+        racers.forEach((r, i) => {
+            r.distance += r.speed * delta;
+
+            if (i > 0) {
+                r.distance += Math.sin(time * .5 + i) * delta;
+            }
+        });
+
+        playerCar.position.z = 7 - racers[0].distance * .6;
+
+        if (playerCar.position.z < -230) {
+            playerCar.position.z = -230;
+        }
+
+        document.getElementById("speed").textContent =
+            Math.round(racers[0].speed * 10);
+
+        opponents.forEach((carMesh, i) => {
+            carMesh.position.z =
+                [3, 0, -4, -8][i] - racers[i + 1].distance * .6;
+
+            if (carMesh.position.z < -230) {
+                carMesh.position.z = -230;
+            }
+        });
+
+        updateLeaderboard();
+
+        if (playerCar.position.z <= -230) {
+            running = false;
+            clearInterval(timerId);
+
+            document.getElementById("status").textContent =
+                "🏁 Finishga yetdingiz!";
+
+            document.getElementById("message").textContent =
+                "🏆 Siz finish chizig‘iga yetdingiz!";
+        }
+    }
+
+    camera.position.x += (playerCar.position.x - camera.position.x) * .04;
+    camera.position.z += (playerCar.position.z + 24 - camera.position.z) * .03;
+    camera.lookAt(playerCar.position.x, 2, playerCar.position.z - 20);
+
+    renderer.render(scene, camera);
+}
+
+window.addEventListener("resize", () => {
+    camera.aspect = host.clientWidth / host.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(host.clientWidth, host.clientHeight);
+});
+
+updateLeaderboard();
+animate();
+</script>
+
+</body>
+</html>
