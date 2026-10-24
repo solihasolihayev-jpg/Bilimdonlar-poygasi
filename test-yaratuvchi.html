@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bilimdonlar Poygasi — Test yaratuvchi</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: linear-gradient(135deg, #07152f, #174b82);
+}
+
+.container {
+  max-width: 850px;
+  margin: auto;
+}
+
+header {
+  text-align: center;
+  padding: 12px;
+}
+
+h1 {
+  color: #ffdc57;
+}
+
+h2 {
+  color: #8ce7ff;
+}
+
+.panel {
+  background: #10294b;
+  border: 1px solid #37608e;
+  border-radius: 15px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-top: 13px;
+  margin-bottom: 6px;
+}
+
+input, textarea, select, button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9px;
+  font-size: 16px;
+}
+
+input, textarea, select {
+  background: #071832;
+  border: 1px solid #416d9e;
+  color: white;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+button {
+  border: none;
+  background: #ffcf46;
+  color: #172642;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondary {
+  background: #285783;
+  color: white;
+}
+
+.danger {
+  background: #a92f48;
+  color: white;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.counter {
+  color: #ffdc57;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.question-card {
+  padding: 12px;
+  margin-top: 10px;
+  background: #17375f;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.question-card button {
+  margin-right: 5px;
+}
+
+.status {
+  min-height: 24px;
+  color: #75ffb1;
+  font-weight: bold;
+  margin-top: 12px;
+}
+
+.muted {
+  color: #c2d8ef;
+  font-size: 14px;
+}
+
+@media(max-width: 500px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <h1>📝 TEST YARATUVCHI</h1>
+  <p>Bilimdonlar Poygasi — o‘z musobaqangizni yarating!</p>
+</header>
+
+<section class="panel">
+  <h2>1. Musobaqa ma’lumotlari</h2>
+
+  <label for="testTitle">Musobaqa nomi</label>
+  <input
+    id="testTitle"
+    maxlength="100"
+    placeholder="Masalan: Informatika bilimdonlari"
+  >
+
+  <label for="subject">Fan nomi</label>
+  <input
+    id="subject"
+    maxlength="100"
+    placeholder="Masalan: Informatika"
+  >
+
+  <label for="organizer">Xona yaratuvchi nomi</label>
+  <input
+    id="organizer"
+    maxlength="60"
+    placeholder="O‘qituvchi ismi"
+  >
+</section>
+
+<section class="panel">
+  <h2>2. Savol yaratish</h2>
+
+  <div class="counter" id="counter">0 / 30 ta savol</div>
+
+  <label for="question">Savol matni</label>
+  <textarea
+    id="question"
+    maxlength="500"
+    placeholder="Savolingizni kiriting..."
+  ></textarea>
+
+  <div class="grid">
+    <div>
+      <label for="answerA">A varianti</label>
+      <input id="answerA" maxlength="250" placeholder="A javob">
+    </div>
+
+    <div>
+      <label for="answerB">B varianti</label>
+      <input id="answerB" maxlength="250" placeholder="B javob">
+    </div>
+
+    <div>
+      <label for="answerC">C varianti</label>
+      <input id="answerC" maxlength="250" placeholder="C javob">
+    </div>
+
+    <div>
+      <label for="answerD">D varianti</label>
+      <input id="answerD" maxlength="250" placeholder="D javob">
+    </div>
+  </div>
+
+  <label for="correct">To‘g‘ri javobni tanlang</label>
+  <select id="correct">
+    <option value="0">A varianti</option>
+    <option value="1">B varianti</option>
+    <option value="2">C varianti</option>
+    <option value="3">D varianti</option>
+  </select>
+
+  <button id="saveQuestion" onclick="saveQuestion()">
+    ➕ Savolni qo‘shish
+  </button>
+
+  <button class="secondary" onclick="clearForm()">
+    🧹 Maydonlarni tozalash
+  </button>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+</section>
+
+<section class="panel">
+  <h2>3. Yaratilgan savollar</h2>
+
+  <p class="muted">
+    Savollarni tekshiring. Har bir savolda 4 ta variant va bitta
+    to‘g‘ri javob bo‘lishi kerak.
+  </p>
+
+  <div id="questionList"></div>
+
+  <button onclick="saveTest()">
+    💾 Testni saqlash
+  </button>
+
+  <button class="secondary" onclick="downloadTest()">
+    📥 Testni JSON fayl sifatida yuklab olish
+  </button>
+
+  <button class="secondary" onclick="loadTestFile()">
+    📂 Saqlangan JSON testni yuklash
+  </button>
+
+  <input
+    type="file"
+    id="fileInput"
+    accept=".json,application/json"
+    hidden
+    onchange="importTest(event)"
+  >
+
+  <button class="danger" onclick="deleteAllQuestions()">
+    🗑️ Barcha savollarni o‘chirish
+  </button>
+</section>
+
+</div>
+
+<script>
+const MAX_QUESTIONS = 30;
+
+let questions = [];
+let editingIndex = -1;
+
+const $ = id => document.getElementById(id);
+
+function saveQuestion() {
+  const q = $("question").value.trim();
+
+  const answers = [
+    $("answerA").value.trim(),
+    $("answerB").value.trim(),
+    $("answerC").value.trim(),
+    $("answerD").value.trim()
+  ];
+
+  const correct = Number($("correct").value);
+
+  if (!q || answers.some(answer => !answer)) {
+    showStatus("❗ Savol va barcha 4 ta variantni to‘ldiring.");
+    return;
+  }
+
+  if (editingIndex === -1 && questions.length >= MAX_QUESTIONS) {
+    showStatus("30 ta savol chegarasiga yetdingiz.");
+    return;
+  }
+
+  const item = {
+    question: q,
+    answers: answers,
+    correct: correct,
+    seconds: 20
+  };
+
+  if (editingIndex >= 0) {
+    questions[editingIndex] = item;
+    editingIndex = -1;
+    $("saveQuestion").textContent = "➕ Savolni qo‘shish";
+    showStatus("✅ Savol yangilandi.");
+  } else {
+    questions.push(item);
+    showStatus("✅ Savol muvaffaqiyatli qo‘shildi.");
+  }
+
+  clearForm(false);
+  renderQuestions();
+}
+
+function renderQuestions() {
+  $("counter").textContent = questions.length + " / 30 ta savol";
+
+  $("saveQuestion").disabled =
+    questions.length >= MAX_QUESTIONS && editingIndex === -1;
+
+  const list = $("questionList");
+  list.innerHTML = "";
+
+  questions.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "question-card";
+
+    const title = document.createElement("strong");
+    title.textContent = (index + 1) + ". " + item.question;
+    card.appendChild(title);
+
+    const options = document.createElement("ol");
+    options.type = "A";
+
+    item.answers.forEach((answer, answerIndex) => {
+      const li = document.createElement("li");
+      li.textContent =
+        answer + (answerIndex === item.correct ? " ✅ To‘g‘ri javob" : "");
+      options.appendChild(li);
+    });
+
+    card.appendChild(options);
+
+    const edit = document.createElement("button");
+    edit.textContent = "✏️ Tahrirlash";
+    edit.className = "secondary";
+    edit.onclick = () => editQuestion(index);
+    card.appendChild(edit);
+
+    const remove = document.createElement("button");
+    remove.textContent = "🗑️ O‘chirish";
+    remove.className = "danger";
+    remove.onclick = () => removeQuestion(index);
+    card.appendChild(remove);
+
+    list.appendChild(card);
+  });
+
+  if (!questions.length) {
+    list.textContent = "Hozircha savollar kiritilmagan.";
+  }
+}
+
+function editQuestion(index) {
+  const item = questions[index];
+
+  $("question").value = item.question;
+  $("answerA").value = item.answers[0];
+  $("answerB").value = item.answers[1];
+  $("answerC").value = item.answers[2];
+  $("answerD").value = item.answers[3];
+  $("correct").value = String(item.correct);
+
+  editingIndex = index;
+
+  $("saveQuestion").textContent = "💾 O‘zgarishlarni saqlash";
+  $("saveQuestion").disabled = false;
+
+  showStatus((index + 1) + "-savol tahrirlash uchun ochildi.");
+  $("question").focus();
+}
+
+function removeQuestion(index) {
+  questions.splice(index, 1);
+
+  if (editingIndex === index) {
+    editingIndex = -1;
+    clearForm(false);
+  } else if (editingIndex > index) {
+    editingIndex--;
+  }
+
+  renderQuestions();
+  showStatus("Savol o‘chirildi.");
+}
+
+function clearForm(showMessage = true) {
+  $("question").value = "";
+  $("answerA").value = "";
+  $("answerB").value = "";
+  $("answerC").value = "";
+  $("answerD").value = "";
+  $("correct").value = "0";
+
+  editingIndex = -1;
+  $("saveQuestion").textContent = "➕ Savolni qo‘shish";
+
+  renderQuestions();
+
+  if (showMessage) {
+    showStatus("Maydonlar tozalandi.");
+  }
+}
+
+function getTestData() {
+  return {
+    title: $("testTitle").value.trim(),
+    subject: $("subject").value.trim(),
+    organizer: $("organizer").value.trim(),
+    maxQuestions: MAX_QUESTIONS,
+    questions: questions
+  };
+}
+
+function validateTest(data) {
+  if (!data.title || !data.subject || !data.organizer) {
+    showStatus("❗ Musobaqa nomi, fan va tashkilotchi nomini kiriting.");
+    return false;
+  }
+
+  if (!data.questions.length) {
+    showStatus("❗ Avval kamida bitta savol yarating.");
+    return false;
+  }
+
+  if (data.questions.length > MAX_QUESTIONS) {
+    showStatus("❗ Savollar soni 30 tadan oshmasligi kerak.");
+    return false;
+  }
+
+  return true;
+}
+
+function saveTest() {
+  const data = getTestData();
+
+  if (!validateTest(data)) return;
+
+  try {
+    localStorage.setItem(
+      "bilimdonlarPoygasiTest",
+      JSON.stringify(data)
+    );
+
+    showStatus("✅ Test ushbu brauzerda saqlandi.");
+  } catch (error) {
+    showStatus("❌ Saqlash amalga oshmadi. Brauzer xotirasini tekshiring.");
+  }
+}
+
+function downloadTest() {
+  const data = getTestData();
+
+  if (!validateTest(data)) return;
+
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json;charset=utf-8" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "bilimdonlar-testi.json";
+  link.click();
+
+  URL.revokeObjectURL(url);
+
+  showStatus("📥 Test JSON fayli sifatida yuklab olindi.");
+}
+
+function loadTestFile() {
+  $("fileInput").click();
+}
+
+function importTest(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+
+      if (
+        !data ||
+        !Array.isArray(data.questions) ||
+        data.questions.length > MAX_QUESTIONS
+      ) {
+        throw new Error("Test formati noto‘g‘ri.");
+      }
+
+      const valid = data.questions.every(q =>
+        typeof q.question === "string" &&
+        Array.isArray(q.answers) &&
+        q.answers.length === 4 &&
+        q.answers.every(a => typeof a === "string") &&
+        Number.isInteger(q.correct) &&
+        q.correct >= 0 &&
+        q.correct <= 3
+      );
+
+      if (!valid) {
+        throw new Error("Savollar formati noto‘g‘ri.");
+      }
+
+      $("testTitle").value = data.title || "";
+      $("subject").value = data.subject || "";
+      $("organizer").value = data.organizer || "";
+
+      questions = data.questions.map(q => ({
+        question: q.question,
+        answers: q.answers,
+        correct: q.correct,
+        seconds: 20
+      }));
+
+      editingIndex = -1;
+      clearForm(false);
+      renderQuestions();
+
+      showStatus("✅ Test fayli muvaffaqiyatli yuklandi.");
+    } catch (error) {
+      showStatus("❌ Fayl noto‘g‘ri yoki buzilgan.");
+    }
+
+    event.target.value = "";
+  };
+
+  reader.readAsText(file);
+}
+
+function deleteAllQuestions() {
+  if (!confirm("Barcha savollar o‘chirilsinmi?")) return;
+
+  questions = [];
+  editingIndex = -1;
+
+  clearForm(false);
+  renderQuestions();
+
+  showStatus("Barcha savollar o‘chirildi.");
+}
+
+function showStatus(message) {
+  $("status").textContent = message;
+}
+
+renderQuestions();
+</script>
+</body>
+</html>
