@@ -1,361 +1,163 @@
-<!DOCTYPE html>
-<html lang="uz">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bilimdonlar Poygasi — Poygachi tanlash</title>
+<div class="avatars" id="avatars">
 
-<style>
-* {
-  box-sizing: border-box;
-}
+<button class="avatar selected" data-avatar="👨‍🎓" data-name="Talaba">
+<span>👨‍🎓</span>Talaba
+</button>
 
-body {
-  margin: 0;
-  padding: 16px;
-  font-family: Arial, sans-serif;
-  color: white;
-  background: linear-gradient(135deg, #07152f, #174b82);
-}
+<button class="avatar" data-avatar="👩‍🎓" data-name="Talaba qiz">
+<span>👩‍🎓</span>Talaba qiz
+</button>
 
-h1, h2 {
-  text-align: center;
-}
+<button class="avatar" data-avatar="🧑‍🚀" data-name="Kosmonavt">
+<span>🧑‍🚀</span>Kosmonavt
+</button>
 
-h1 {
-  color: #ffdb55;
-  font-size: 27px;
-}
+<button class="avatar" data-avatar="👩‍🚀" data-name="Kosmonavt qiz">
+<span>👩‍🚀</span>Kosmonavt qiz
+</button>
 
-h2 {
-  color: #85e4ff;
-}
+<button class="avatar" data-avatar="🦸" data-name="Super qahramon">
+<span>🦸</span>Super qahramon
+</button>
 
-.container {
-  max-width: 900px;
-  margin: auto;
-}
+<button class="avatar" data-avatar="🥷" data-name="Ninja">
+<span>🥷</span>Ninja
+</button>
 
-.panel {
-  background: #10294b;
-  border: 1px solid #37608e;
-  border-radius: 16px;
-  padding: 18px;
-  margin-bottom: 18px;
-}
+<button class="avatar" data-avatar="🤖" data-name="Robot">
+<span>🤖</span>Robot
+</button>
 
-label {
-  display: block;
-  margin: 12px 0 6px;
-}
+<button class="avatar" data-avatar="🧙" data-name="Sehrgar">
+<span>🧙</span>Sehrgar
+</button>
 
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 16px;
-}
+<button class="avatar" data-avatar="🧑‍🔬" data-name="Olim">
+<span>🧑‍🔬</span>Olim
+</button>
 
-input, select {
-  background: #071832;
-  color: white;
-  border: 1px solid #416d9e;
-}
+<button class="avatar" data-avatar="🕵️" data-name="Detektiv">
+<span>🕵️</span>Detektiv
+</button>
 
-button {
-  cursor: pointer;
-  font-weight: bold;
-}
+<button class="avatar" data-avatar="🧑‍🚒" data-name="Qutqaruvchi">
+<span>🧑‍🚒</span>Qutqaruvchi
+</button>
 
-.avatars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
+<button class="avatar" data-avatar="🥳" data-name="Quvnoq poygachi">
+<span>🥳</span>Quvnoq poygachi
+</button>
 
-.avatar {
-  background: #193b65;
-  color: white;
-  border: 2px solid #37608e;
-  min-height: 105px;
-}
+<button class="avatar" data-avatar="🧑‍✈️" data-name="Uchuvchi">
+<span>🧑‍✈️</span>Uchuvchi
+</button>
 
-.avatar span {
-  display: block;
-  font-size: 35px;
-  margin-bottom: 6px;
-}
+<button class="avatar" data-avatar="👨‍🚒" data-name="Olovbardosh">
+<span>👨‍🚒</span>Olovbardosh
+</button>
 
-.avatar.selected {
-  border: 3px solid #ffdb55;
-  background: #285783;
-}
+<button class="avatar" data-avatar="👩‍🔬" data-name="Olim qiz">
+<span>👩‍🔬</span>Olim qiz
+</button>
 
-.main-button {
-  margin-top: 15px;
-  border: none;
-  background: linear-gradient(90deg, #ffdb55, #ff9d35);
-  color: #10213c;
-}
+<button class="avatar" data-avatar="🧑‍🎤" data-name="Yulduz">
+<span>🧑‍🎤</span>Yulduz
+</button>
 
-.preview {
-  text-align: center;
-  background: #071832;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 15px;
-}
+<button class="avatar" data-avatar="🧝" data-name="Elf">
+<span>🧝</span>Elf
+</button>
 
-#bigAvatar {
-  font-size: 75px;
-}
+<button class="avatar" data-avatar="🧛" data-name="Vampir">
+<span>🧛</span>Vampir
+</button>
 
-#previewName {
-  font-size: 23px;
-  color: #ffdb55;
-  margin: 8px;
-}
+<button class="avatar" data-avatar="🧟" data-name="Zombi">
+<span>🧟</span>Zombi
+</button>
 
-#result {
-  text-align: center;
-  color: #75ffb1;
-  font-weight: bold;
-  overflow-wrap: anywhere;
-}
+<button class="avatar" data-avatar="🧞" data-name="Jin">
+<span>🧞</span>Jin
+</button>
 
-@media (max-width: 450px) {
-  .avatars {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-</style>
-</head>
+<button class="avatar" data-avatar="🧚" data-name="Pari">
+<span>🧚</span>Pari
+</button>
 
-<body>
-<div class="container">
+<button class="avatar" data-avatar="🦹" data-name="Yovuz qahramon">
+<span>🦹</span>Yovuz qahramon
+</button>
 
-<h1>🏁 BILIMDONLAR POYGASI</h1>
+<button class="avatar" data-avatar="🥋" data-name="Karatechi">
+<span>🥋</span>Karatechi
+</button>
 
-<div class="panel">
-  <h2>✍️ 1. Ismingizni kiriting</h2>
+<button class="avatar" data-avatar="🤠" data-name="Kovboy">
+<span>🤠</span>Kovboy
+</button>
 
-  <label for="playerName">Poygachi ismi</label>
-  <input
-    id="playerName"
-    maxlength="24"
-    placeholder="Ismingizni yozing"
-  >
-</div>
+<button class="avatar" data-avatar="👨‍⚕️" data-name="Shifokor">
+<span>👨‍⚕️</span>Shifokor
+</button>
 
-<div class="panel">
-  <h2>🧑‍🚀 2. Poygachi avataringizni tanlang</h2>
+<button class="avatar" data-avatar="👩‍⚕️" data-name="Shifokor qiz">
+<span>👩‍⚕️</span>Shifokor qiz
+</button>
 
-  <div class="avatars" id="avatars">
+<button class="avatar" data-avatar="🧑‍🏫" data-name="Ustoz">
+<span>🧑‍🏫</span>Ustoz
+</button>
 
-    <button class="avatar selected"
-      data-avatar="🧑‍🎓" data-name="Talaba">
-      <span>🧑‍🎓</span>Talaba
-    </button>
+<button class="avatar" data-avatar="👨‍🍳" data-name="Oshpaz">
+<span>👨‍🍳</span>Oshpaz
+</button>
 
-    <button class="avatar"
-      data-avatar="👩‍🎓" data-name="Talaba qiz">
-      <span>👩‍🎓</span>Talaba qiz
-    </button>
+<button class="avatar" data-avatar="👩‍🍳" data-name="Oshpaz qiz">
+<span>👩‍🍳</span>Oshpaz qiz
+</button>
 
-    <button class="avatar"
-      data-avatar="🧑‍🚀" data-name="Kosmonavt">
-      <span>🧑‍🚀</span>Kosmonavt
-    </button>
+<button class="avatar" data-avatar="🧑‍🎨" data-name="Rassom">
+<span>🧑‍🎨</span>Rassom
+</button>
 
-    <button class="avatar"
-      data-avatar="👩‍🚀" data-name="Kosmonavt qiz">
-      <span>👩‍🚀</span>Kosmonavt qiz
-    </button>
+<button class="avatar" data-avatar="🧑‍💻" data-name="Dasturchi">
+<span>🧑‍💻</span>Dasturchi
+</button>
 
-    <button class="avatar"
-      data-avatar="🦸" data-name="Super qahramon">
-      <span>🦸</span>Super qahramon
-    </button>
+<button class="avatar" data-avatar="👨‍🚀" data-name="Fazo qahramoni">
+<span>👨‍🚀</span>Fazo qahramoni
+</button>
 
-    <button class="avatar"
-      data-avatar="🥷" data-name="Ninja">
-      <span>🥷</span>Ninja
-    </button>
+<button class="avatar" data-avatar="🦾" data-name="Kiborg">
+<span>🦾</span>Kiborg
+</button>
 
-    <button class="avatar"
-      data-avatar="🤖" data-name="Robot">
-      <span>🤖</span>Robot
-    </button>
+<button class="avatar" data-avatar="🦿" data-name="Robot poygachi">
+<span>🦿</span>Robot poygachi
+</button>
 
-    <button class="avatar"
-      data-avatar="🧙" data-name="Sehrgar">
-      <span>🧙</span>Sehrgar
-    </button>
+<button class="avatar" data-avatar="🐱" data-name="Mushuk poygachi">
+<span>🐱</span>Mushuk poygachi
+</button>
 
-    <button class="avatar"
-      data-avatar="🧑‍🔬" data-name="Olim">
-      <span>🧑‍🔬</span>Olim
-    </button>
+<button class="avatar" data-avatar="🐼" data-name="Panda poygachi">
+<span>🐼</span>Panda poygachi
+</button>
 
-    <button class="avatar"
-      data-avatar="🕵️" data-name="Detektiv">
-      <span>🕵️</span>Detektiv
-    </button>
+<button class="avatar" data-avatar="🦊" data-name="Tulki poygachi">
+<span>🦊</span>Tulki poygachi
+</button>
 
-    <button class="avatar"
-      data-avatar="🧑‍🚒" data-name="Qutqaruvchi">
-      <span>🧑‍🚒</span>Qutqaruvchi
-    </button>
+<button class="avatar" data-avatar="🐯" data-name="Yo‘lbars poygachi">
+<span>🐯</span>Yo‘lbars poygachi
+</button>
 
-    <button class="avatar"
-      data-avatar="🥳" data-name="Quvnoq poygachi">
-      <span>🥳</span>Quvnoq poygachi
-    </button>
+<button class="avatar" data-avatar="🐸" data-name="Qurbaqa poygachi">
+<span>🐸</span>Qurbaqa poygachi
+</button>
 
-  </div>
-</div>
-
-<div class="panel">
-  <h2>🏎️ 3. Transport tanlang</h2>
-
-  <label for="vehicle">Poyga transportingiz</label>
-
-  <select id="vehicle">
-    <option value="🏎️ Sport avtomobili">
-      🏎️ Sport avtomobili
-    </option>
-
-    <option value="🚗 Poyga avtomobili">
-      🚗 Poyga avtomobili
-    </option>
-
-    <option value="🏍️ Mototsikl">
-      🏍️ Mototsikl
-    </option>
-
-    <option value="🚙 Ralli avtomobili">
-      🚙 Ralli avtomobili
-    </option>
-
-    <option value="🚘 Superkar">
-      🚘 Superkar
-    </option>
-
-    <option value="🛵 Skuter">
-      🛵 Skuter
-    </option>
-  </select>
-
-  <label for="carColor">Transport rangi</label>
-
-  <select id="carColor">
-    <option>Qizil</option>
-    <option>Ko‘k</option>
-    <option>Yashil</option>
-    <option>Sariq</option>
-    <option>Binafsha</option>
-    <option>Oq</option>
-  </select>
-
-  <div class="preview">
-    <div id="bigAvatar">🧑‍🎓</div>
-    <div id="previewName">Yangi poygachi</div>
-    <div id="previewDetails">
-      Talaba | 🏎️ Sport avtomobili | Qizil
-    </div>
-  </div>
-
-  <button class="main-button" onclick="saveProfile()">
-    ✅ Poygachini tasdiqlash
-  </button>
-
-  <p id="result"></p>
-</div>
+<button class="avatar" data-avatar="🐲" data-name="Ajdarho poygachi">
+<span>🐲</span>Ajdarho poygachi
+</button>
 
 </div>
-
-<script>
-let selectedAvatar = "🧑‍🎓";
-let selectedAvatarName = "Talaba";
-
-const nameInput = document.getElementById("playerName");
-const vehicleInput = document.getElementById("vehicle");
-const colorInput = document.getElementById("carColor");
-
-function updatePreview() {
-  const name = nameInput.value.trim() || "Yangi poygachi";
-
-  document.getElementById("bigAvatar").textContent =
-    selectedAvatar;
-
-  document.getElementById("previewName").textContent =
-    name;
-
-  document.getElementById("previewDetails").textContent =
-    selectedAvatarName + " | " +
-    vehicleInput.value + " | " +
-    colorInput.value;
-}
-
-document.querySelectorAll(".avatar").forEach(button => {
-  button.addEventListener("click", () => {
-
-    document.querySelectorAll(".avatar").forEach(item => {
-      item.classList.remove("selected");
-    });
-
-    button.classList.add("selected");
-
-    selectedAvatar = button.dataset.avatar;
-    selectedAvatarName = button.dataset.name;
-
-    updatePreview();
-  });
-});
-
-nameInput.addEventListener("input", updatePreview);
-vehicleInput.addEventListener("change", updatePreview);
-colorInput.addEventListener("change", updatePreview);
-
-function saveProfile() {
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    document.getElementById("result").textContent =
-      "❗ Avval ismingizni kiriting!";
-    nameInput.focus();
-    return;
-  }
-
-  const profile = {
-    name: name,
-    avatar: selectedAvatar,
-    avatarName: selectedAvatarName,
-    vehicle: vehicleInput.value,
-    color: colorInput.value
-  };
-
-  try {
-    localStorage.setItem(
-      "bilimdonlarPoygasiProfile",
-      JSON.stringify(profile)
-    );
-  } catch (error) {
-    document.getElementById("result").textContent =
-      "Profilni saqlab bo‘lmadi. Brauzer sozlamalarini tekshiring.";
-    return;
-  }
-
-  document.getElementById("result").textContent =
-    "✅ Poygachi tayyor: " +
-    profile.avatar + " " +
-    profile.name + "!";
-
-  updatePreview();
-}
-
-updatePreview();
-</script>
-
-</body>
-</html>
